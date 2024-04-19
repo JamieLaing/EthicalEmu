@@ -13,7 +13,7 @@ resource "random_string" "chars" {
   min_lower = 6
 }
 
-# Create a virtual network for all VMs
+# Create a virtual network for each customer
 resource "azurerm_virtual_network" "vnet" {
   for_each            = var.customers
   address_space       = ["${each.value.network}"]
@@ -25,7 +25,7 @@ resource "azurerm_virtual_network" "vnet" {
   ]
 }
 
-# Create a subnet for all VMs
+# Create a subnet for each customer
 resource "azurerm_subnet" "subnet" {
   for_each             = var.customers
   address_prefixes     = ["${each.value.subnet}"]
@@ -163,14 +163,14 @@ resource "azurerm_network_interface" "nic" {
 
 #Enable AAD Login for each VM
 resource "azurerm_virtual_machine_extension" "vmext_aadlogin" {
-  for_each             = var.customers
+  for_each                   = var.customers
   auto_upgrade_minor_version = true
-  name                 = "AADLoginForWindows"
-  virtual_machine_id   = azurerm_windows_virtual_machine.vm[each.key].id
-  publisher            = "Microsoft.Azure.ActiveDirectory"
-  type                 = "AADLoginForWindows"
-  type_handler_version = "2.0"
-  depends_on = [ azurerm_windows_virtual_machine.vm ]
+  name                       = "AADLoginForWindows"
+  virtual_machine_id         = azurerm_windows_virtual_machine.vm[each.key].id
+  publisher                  = "Microsoft.Azure.ActiveDirectory"
+  type                       = "AADLoginForWindows"
+  type_handler_version       = "2.0"
+  depends_on                 = [azurerm_windows_virtual_machine.vm]
 }
 
 #Enable DSC for each VM
