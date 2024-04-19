@@ -1,4 +1,4 @@
-These Terraform scripts are free to use, and intended to demonstrate the generation of "ethically walled", secure work environments that isolate customer networks in a multi-tenant environment, using Azure Virtual Desktops with access centrally controlled using Entra ID.
+These Terraform scripts are free to use, and intended to demonstrate the generation of "ethically walled", secure work environments that isolate customer networks in a multi-tenant environment, using Azure Virtual Desktops with access centrally controlled using Entra ID.  Users gain machine access using the secure Remote Desktop Web client, which uses the same login route as the Azure console, and inherets all the MFA features found there, including FIDO2 security key support.
 
 These configuration files use the technique of [for_each](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each) where an input variable is declared using an [object](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#object) map to define attributes that are specific to each customer silo.
 
