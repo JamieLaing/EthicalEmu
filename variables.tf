@@ -71,7 +71,7 @@ variable "admin_password" {
 variable "admin_username" {
   default     = "LocalAdmin"
   type        = string
-  description = "Username value taken from local machine env variable."
+  description = "Virtual machine administrator username"
 }
 
 #Domain machine admins
