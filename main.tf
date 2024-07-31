@@ -25,6 +25,11 @@ resource "azurerm_virtual_network" "vnet" {
   ]
 }
 
+resource "time_sleep" "network_delay" {
+  depends_on      = [azurerm_virtual_network.vnet]
+  create_duration = "10s"
+}
+
 # Create a subnet for each customer
 resource "azurerm_subnet" "subnet" {
   for_each             = var.customers
@@ -32,9 +37,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = "default"
   resource_group_name  = azurerm_resource_group.sh.name
   virtual_network_name = azurerm_virtual_network.vnet[each.key].name
-  depends_on = [
-    azurerm_virtual_network.vnet
-  ]
+  depends_on           = [time_sleep.network_delay]
 }
 
 # Create an AVD host pool for each customer
@@ -58,6 +61,9 @@ resource "azurerm_virtual_desktop_host_pool_registration_info" "hostpool-info" {
   for_each        = var.customers
   hostpool_id     = azurerm_virtual_desktop_host_pool.hostpool[each.key].id
   expiration_date = timeadd(timestamp(), "24h")
+  depends_on = [
+    azurerm_virtual_desktop_host_pool.hostpool
+  ]
 }
 
 # Create AVD Desktop Application Group for each customer
@@ -83,7 +89,7 @@ resource "azurerm_virtual_desktop_application_group" "dag" {
 resource "azurerm_virtual_desktop_workspace" "workspace" {
   for_each            = var.customers
   description         = "Workspace used for ${each.value.long_name}"
-  friendly_name       = "${each.value.long_name} ws"
+  friendly_name       = "${each.value.long_name} Workspace"
   location            = azurerm_resource_group.sh.location
   name                = "${each.value.short_name}-ws"
   resource_group_name = azurerm_resource_group.sh.name
@@ -104,8 +110,8 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "ws-d
 #Create a virtual machine for each customer
 resource "azurerm_windows_virtual_machine" "vm" {
   for_each       = var.customers
-  admin_password = var.password
-  admin_username = "LocalAdmin"
+  admin_password = var.admin_password
+  admin_username = var.admin_username
   license_type   = "Windows_Client"
   location       = azurerm_resource_group.sh.location
   name           = "EE-${each.value.short_name}-${random_string.chars.id}"
@@ -114,12 +120,12 @@ resource "azurerm_windows_virtual_machine" "vm" {
   ]
   resource_group_name = azurerm_resource_group.sh.name
   secure_boot_enabled = true
-  size                = "Standard_DS2_v2"
+  size                = var.azure_machine_size
   tags = {
     cm-resource-parent = azurerm_virtual_desktop_host_pool.hostpool[each.key].id
   }
   vtpm_enabled = true
-  zone         = 1
+  zone         = var.machine_zone
   additional_capabilities {
   }
   boot_diagnostics {
@@ -210,14 +216,14 @@ resource "azurerm_virtual_machine_extension" "vmext_dsc" {
 
 #Enable Azure Policy for each VM
 #TODO: remove this?
-resource "azurerm_virtual_machine_extension" "azure_policy" {
-  for_each                   = var.customers
-  auto_upgrade_minor_version = true
-  automatic_upgrade_enabled  = true
-  name                       = "AzurePolicyforWindows"
-  publisher                  = "Microsoft.GuestConfiguration"
-  type                       = "ConfigurationforWindows"
-  type_handler_version       = "1.1"
-  virtual_machine_id         = azurerm_windows_virtual_machine.vm[each.key].id
-  depends_on                 = [azurerm_windows_virtual_machine.vm]
-}
+# resource "azurerm_virtual_machine_extension" "azure_policy" {
+#   for_each                   = var.customers
+#   auto_upgrade_minor_version = true
+#   automatic_upgrade_enabled  = true
+#   name                       = "AzurePolicyforWindows"
+#   publisher                  = "Microsoft.GuestConfiguration"
+#   type                       = "ConfigurationforWindows"
+#   type_handler_version       = "1.1"
+#   virtual_machine_id         = azurerm_windows_virtual_machine.vm[each.key].id
+#   depends_on                 = [azurerm_windows_virtual_machine.vm]
+# }
