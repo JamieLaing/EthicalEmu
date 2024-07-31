@@ -64,7 +64,7 @@ variable "admin_password" {
   type        = string
   description = <<EOT
     Password value taken from local machine env variable. 
-    To apply the value in a linux environment, and assuming you are using VS code for IDE, use "export TF_VAR_username=<EnterValueHere>"
+    To apply the value in a linux environment, and assuming you are using VS code for IDE, use "export TF_VAR_admin_password=<EnterValueHere>"
   EOT
 }
 
