@@ -17,16 +17,16 @@ variable "customers" {
         "environment" = "dev"
       },
     },
-    c2 = {
-      short_name = "Cust2"
-      long_name  = "Customer Two"
-      network    = "10.101.0.0/16"
-      subnet     = "10.101.0.0/24"
-      tags = {
-        "customer"    = "cust2"
-        "environment" = "dev"
-      },
-    },
+    # c2 = {
+    #   short_name = "Cust2"
+    #   long_name  = "Customer Two"
+    #   network    = "10.101.0.0/16"
+    #   subnet     = "10.101.0.0/24"
+    #   tags = {
+    #     "customer"    = "cust2"
+    #     "environment" = "dev"
+    #   },
+    # },
     # c3 = {
     #   short_name = "Cust3"
     #   long_name  = "Customer Three"
