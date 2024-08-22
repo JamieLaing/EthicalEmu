@@ -115,6 +115,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   license_type   = "Windows_Client"
   location       = azurerm_resource_group.sh.location
   name           = "EE-${each.value.short_name}-${random_string.chars.id}"
+  timezone = "Central Standard Time"
   network_interface_ids = [
     azurerm_network_interface.nic[each.key].id
   ]
@@ -196,8 +197,7 @@ resource "azurerm_virtual_machine_extension" "vmext_dsc" {
         "UseAgentDownloadEndpoint":true,
         "aadJoin":true,
         "aadJoinPreview":false,
-        "HostPoolName":"${azurerm_virtual_desktop_host_pool.hostpool[each.key].name}",
-        "timezone":"Central Standard Time"
+        "HostPoolName":"${azurerm_virtual_desktop_host_pool.hostpool[each.key].name}"
       }
     }
   SETTINGS
