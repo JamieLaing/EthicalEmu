@@ -197,7 +197,7 @@ resource "azurerm_virtual_machine_extension" "vmext_dsc" {
         "aadJoin":true,
         "aadJoinPreview":false,
         "HostPoolName":"${azurerm_virtual_desktop_host_pool.hostpool[each.key].name}",
-        "timeZone":"Central Standard Time"
+        "timezone":"Central Standard Time"
       }
     }
   SETTINGS
